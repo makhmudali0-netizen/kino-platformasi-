@@ -7,7 +7,7 @@ export default function RoomChat({ roomId, onSendReaction }) {
   const { user } = useAuth();
   const [messages, setMessages] = useState([]);
   const [inputText, setInputText] = useState('');
-  const messagesEndRef = useRef(null);
+  const messagesContainerRef = useRef(null);
 
   const socket = getSocket();
 
@@ -23,7 +23,10 @@ export default function RoomChat({ roomId, onSendReaction }) {
   }, [socket]);
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    // Only scroll the internal messages container, NOT the whole browser window/display
+    if (messagesContainerRef.current) {
+      messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
+    }
   }, [messages]);
 
   const handleSendMessage = (e) => {
@@ -74,7 +77,7 @@ export default function RoomChat({ roomId, onSendReaction }) {
       </div>
 
       {/* Messages Scroll Area */}
-      <div className="flex-1 p-3 overflow-y-auto space-y-3 min-h-[160px] max-h-[300px] text-xs">
+      <div ref={messagesContainerRef} className="flex-1 p-3 overflow-y-auto space-y-3 min-h-[160px] max-h-[300px] text-xs">
         {messages.length === 0 ? (
           <div className="h-full flex items-center justify-center text-zinc-500 text-center text-xs p-4">
             Do‘stlaringiz bilan xabarlashing va emojilar yuboring!
@@ -108,7 +111,6 @@ export default function RoomChat({ roomId, onSendReaction }) {
             );
           })
         )}
-        <div ref={messagesEndRef} />
       </div>
 
       {/* Input */}
