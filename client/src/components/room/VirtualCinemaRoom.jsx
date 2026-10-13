@@ -467,79 +467,87 @@ export default function VirtualCinemaRoom({ room, movie }) {
       )}
 
       {/* VIRTUAL CINEMA ROOM VIEW (2.5D Lounge with TV, Sofa, Walkways and Avatars) */}
-      <div className="flex flex-col lg:flex-row gap-4 p-4 sm:p-6">
+      <div className={isFullscreen ? "w-full h-full p-0 m-0" : "flex flex-col lg:flex-row gap-4 p-4 sm:p-6"}>
           
           {/* Main 2.5D Cinema Room Canvas */}
-          <div className="relative flex-1 min-h-[520px] sm:min-h-[620px] rounded-2xl bg-gradient-to-b from-zinc-900 via-zinc-950 to-black border border-zinc-800/80 overflow-hidden shadow-inner flex flex-col justify-between">
+          <div className={
+            isFullscreen 
+              ? "w-full h-full p-0 m-0 bg-black border-0 rounded-none shadow-none flex flex-col justify-center items-center overflow-hidden" 
+              : "relative flex-1 min-h-[520px] sm:min-h-[620px] rounded-2xl bg-gradient-to-b from-zinc-900 via-zinc-950 to-black border border-zinc-800/80 overflow-hidden shadow-inner flex flex-col justify-between"
+          }>
             
-            {/* Ambient Ceiling Lights & Wall Decors */}
-            <div className="absolute top-0 left-0 right-0 h-8 flex justify-around items-center px-12 pointer-events-none opacity-60">
-              <div className="w-8 h-2 rounded-full bg-amber-500/30 blur-sm" />
-              <div className="w-12 h-2 rounded-full bg-red-500/30 blur-sm" />
-              <div className="w-8 h-2 rounded-full bg-amber-500/30 blur-sm" />
-            </div>
-
-            {/* Room Header Controls */}
-            <div className="relative z-20 flex items-center justify-between p-4 bg-gradient-to-b from-black/80 to-transparent">
-              <div className="flex items-center gap-2.5">
-                <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-600/90 text-white font-bold text-xs shadow-md">
-                  <span className="w-2 h-2 rounded-full bg-white animate-ping" />
-                  Jonli Zal ({members.length}/4)
-                </span>
-                <span className="text-xs font-semibold text-zinc-300 hidden sm:inline">
-                  {currentVideoTitle || room.title}
-                </span>
+            {/* Ambient Ceiling Lights & Wall Decors (faqat zaldagi holatda) */}
+            {!isFullscreen && (
+              <div className="absolute top-0 left-0 right-0 h-8 flex justify-around items-center px-12 pointer-events-none opacity-60">
+                <div className="w-8 h-2 rounded-full bg-amber-500/30 blur-sm" />
+                <div className="w-12 h-2 rounded-full bg-red-500/30 blur-sm" />
+                <div className="w-8 h-2 rounded-full bg-amber-500/30 blur-sm" />
               </div>
+            )}
 
-              <div className="flex items-center gap-2">
-                {/* Local Video File Picker from PC / Phone */}
-                <input
-                  type="file"
-                  ref={localFileInputRef}
-                  accept="video/*"
-                  onChange={handleLocalVideoFileSelect}
-                  className="hidden"
-                />
+            {/* Room Header Controls (faqat zaldagi holatda) */}
+            {!isFullscreen && (
+              <div className="relative z-20 flex items-center justify-between p-4 bg-gradient-to-b from-black/80 to-transparent">
+                <div className="flex items-center gap-2.5">
+                  <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-600/90 text-white font-bold text-xs shadow-md">
+                    <span className="w-2 h-2 rounded-full bg-white animate-ping" />
+                    Jonli Zal ({members.length}/4)
+                  </span>
+                  <span className="text-xs font-semibold text-zinc-300 hidden sm:inline">
+                    {currentVideoTitle || room.title}
+                  </span>
+                </div>
 
-                <button
-                  onClick={() => localFileInputRef.current?.click()}
-                  disabled={isUploadingVideo}
-                  title="Kompyuter fayllari yoki telefon galereyasidan videoni tanlang"
-                  className="flex items-center gap-1.5 bg-gradient-to-r from-zinc-800 to-zinc-900 hover:from-zinc-700 hover:to-zinc-800 text-amber-300 hover:text-amber-200 text-xs font-bold py-1.5 px-3 rounded-xl border border-amber-500/30 shadow-md transition-all active:scale-95 cursor-pointer"
-                >
-                  <FolderUp className="w-3.5 h-3.5 text-amber-400" />
-                  <span>{isUploadingVideo ? 'Yuklanmoqda...' : 'Qurilmadan video (Kompyuter / Galereya)'}</span>
-                </button>
+                <div className="flex items-center gap-2">
+                  {/* Local Video File Picker from PC / Phone */}
+                  <input
+                    type="file"
+                    ref={localFileInputRef}
+                    accept="video/*"
+                    onChange={handleLocalVideoFileSelect}
+                    className="hidden"
+                  />
 
-                {/* Ko'rib bo'ldim (O'chirish) button for private/uploaded movies */}
-                {(movie.isPrivate === 1 || movie.id?.startsWith('mov_user_') || movie.uploadedBy === activeUser?.id) && (
                   <button
-                    onClick={handleManualFinishAndDelete}
-                    title="Kinoni ko‘rib bo‘ldim (Serverdan o‘chirish)"
-                    className="flex items-center gap-1.5 bg-red-950/80 hover:bg-red-900 text-red-300 hover:text-white text-xs font-bold py-1.5 px-3 rounded-xl border border-red-700/60 shadow-md transition-all active:scale-95 cursor-pointer"
+                    onClick={() => localFileInputRef.current?.click()}
+                    disabled={isUploadingVideo}
+                    title="Kompyuter fayllari yoki telefon galereyasidan videoni tanlang"
+                    className="flex items-center gap-1.5 bg-gradient-to-r from-zinc-800 to-zinc-900 hover:from-zinc-700 hover:to-zinc-800 text-amber-300 hover:text-amber-200 text-xs font-bold py-1.5 px-3 rounded-xl border border-amber-500/30 shadow-md transition-all active:scale-95 cursor-pointer"
                   >
-                    <Trash2 className="w-3.5 h-3.5 text-red-400" />
-                    <span className="hidden sm:inline">Ko‘rib bo‘ldim (O‘chirish)</span>
+                    <FolderUp className="w-3.5 h-3.5 text-amber-400" />
+                    <span>{isUploadingVideo ? 'Yuklanmoqda...' : 'Qurilmadan video (Kompyuter / Galereya)'}</span>
                   </button>
-                )}
 
-                <button
-                  onClick={() => setIsInviteOpen(true)}
-                  className="flex items-center gap-1.5 bg-gradient-to-r from-red-600 to-amber-600 hover:from-red-500 hover:to-amber-500 text-white text-xs font-bold py-1.5 px-3.5 rounded-xl shadow-lg transition-all active:scale-95"
-                >
-                  <UserPlus className="w-3.5 h-3.5" />
-                  <span>Do‘stni taklif qilish</span>
-                </button>
+                  {/* Ko'rib bo'ldim (O'chirish) button for private/uploaded movies */}
+                  {(movie.isPrivate === 1 || movie.id?.startsWith('mov_user_') || movie.uploadedBy === activeUser?.id) && (
+                    <button
+                      onClick={handleManualFinishAndDelete}
+                      title="Kinoni ko‘rib bo‘ldim (Serverdan o‘chirish)"
+                      className="flex items-center gap-1.5 bg-red-950/80 hover:bg-red-900 text-red-300 hover:text-white text-xs font-bold py-1.5 px-3 rounded-xl border border-red-700/60 shadow-md transition-all active:scale-95 cursor-pointer"
+                    >
+                      <Trash2 className="w-3.5 h-3.5 text-red-400" />
+                      <span className="hidden sm:inline">Ko‘rib bo‘ldim (O‘chirish)</span>
+                    </button>
+                  )}
 
-                <button
-                  onClick={toggleFullscreen}
-                  title="Kattalashtirish (Fullscreen)"
-                  className="p-2 bg-zinc-800/80 hover:bg-zinc-700 text-zinc-200 rounded-xl transition-colors cursor-pointer"
-                >
-                  <Maximize2 className="w-4 h-4" />
-                </button>
+                  <button
+                    onClick={() => setIsInviteOpen(true)}
+                    className="flex items-center gap-1.5 bg-gradient-to-r from-red-600 to-amber-600 hover:from-red-500 hover:to-amber-500 text-white text-xs font-bold py-1.5 px-3.5 rounded-xl shadow-lg transition-all active:scale-95"
+                  >
+                    <UserPlus className="w-3.5 h-3.5" />
+                    <span>Do‘stni taklif qilish</span>
+                  </button>
+
+                  <button
+                    onClick={toggleFullscreen}
+                    title="Kattalashtirish (Fullscreen)"
+                    className="p-2 bg-zinc-800/80 hover:bg-zinc-700 text-zinc-200 rounded-xl transition-colors cursor-pointer"
+                  >
+                    <Maximize2 className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
-            </div>
+            )}
 
             {/* ========================================= */}
             {/* 1. KATTA TELEVIZOR / TO'LIQ EKRANLI KINO */}

@@ -55,10 +55,26 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// Serve static frontend build
+// Serve static frontend build with strict no-cache for index.html
 const clientDistPath = path.resolve(__dirname, '../../client/dist');
 const indexHtmlPath = path.resolve(clientDistPath, 'index.html');
-app.use(express.static(clientDistPath));
+
+app.use((req, res, next) => {
+  if (req.path === '/' || req.path.endsWith('.html') || !path.extname(req.path)) {
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+  }
+  next();
+});
+
+app.use(express.static(clientDistPath, {
+  setHeaders: (res, filePath) => {
+    if (filePath.endsWith('.html')) {
+      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    }
+  }
+}));
 
 // Fallback all other routes to index.html for client-side routing
 app.use((req, res, next) => {
@@ -67,6 +83,7 @@ app.use((req, res, next) => {
   }
   if (fs.existsSync(indexHtmlPath)) {
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
     return res.send(fs.readFileSync(indexHtmlPath, 'utf8'));
   }
   res.status(404).send('Frontend build topilmadi.');
