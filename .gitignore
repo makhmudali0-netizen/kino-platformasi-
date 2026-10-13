@@ -1,0 +1,27 @@
+# Dependencies
+node_modules/
+client/node_modules/
+server/node_modules/
+
+# Production build (Render builds it during deployment)
+client/dist/
+
+# Environment files
+.env
+server/.env
+*.env.local
+
+# Temporary database files
+server/data/*.db-wal
+server/data/*.db-shm
+
+# Large user uploads (GitHub rejects files > 100MB)
+server/uploads/*
+!server/uploads/.gitkeep
+
+# System & Editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.log
